@@ -1,0 +1,31 @@
+# Eclipse
+.classpath
+.project
+.settings/
+classes/
+**/classes/
+bin/
+**/bin/
+!devops/bin
+
+# Intellij
+.idea/
+*.iml
+*.iws
+out/
+
+.bundle/
+.rakeTasks
+
+# Working directory
+build/
+
+# Vim
+*.swp
+/nbproject/private/
+
+# Gradle
+.gradle/
+
+#Documentation
+**/_build
