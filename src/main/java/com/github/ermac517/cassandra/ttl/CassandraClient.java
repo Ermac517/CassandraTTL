@@ -1,18 +1,83 @@
-package com.github.ermac517.cassandra;
+package com.github.ermac517.cassandra.ttl;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-
-import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Host;
 import com.datastax.driver.core.Metadata;
-import com.datastax.driver.core.PreparedStatement;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
+import com.datastax.driver.core.policies.ConstantReconnectionPolicy;
+import com.datastax.driver.core.policies.DowngradingConsistencyRetryPolicy;
 
+/**
+ * Connects to Cassandra Server and updates TTL of each row of each column family
+ */
+public class CassandraClient
+{
+    /**
+     * IP or domain name of any node in the cluster
+     */
+    private String url;
+    /**
+     * RPC port
+     */
+    private String port;
+    /**
+     * Name of the Keyspace
+     */
+    private String keyspace;
+    /**
+     * Name of the table/column family
+     */
+    private String table;
+    /**
+     * TTL value to assign to all keys
+     */
+    private String ttl;
+    /**
+     * Current Session with Cluster
+     */
+    private Session session;
+    
+    /**
+     * Constructor
+     * @param args
+     */
+    public CassandraClient(String... args)
+    {
+        this.url = args[0];
+        this.port = args[1];
+        this.keyspace = args[2];
+        this.table = args[3];
+        this.ttl = args[4];
+    }
+    
+    /**
+     * Starts a session with a cluster
+     */
+    public void connect()
+    {
+        Cluster cluster = Cluster.builder().addContactPoint(url)
+                                           .withPort(Integer.parseInt(port))
+                                           .withRetryPolicy(DowngradingConsistencyRetryPolicy.INSTANCE)
+                                           .withReconnectionPolicy(new ConstantReconnectionPolicy(100L))
+                                           .build();
+        Metadata metadata = cluster.getMetadata();
+        System.out.printf("Connected to cluster: %s\n", metadata.getClusterName());
+        for (Host host : metadata.getAllHosts()) 
+        {
+            System.out.printf("Datacenter: %s; Host: %s; Rack: %s\n", host.getDatacenter(), host.getAddress(), host.getRack());
+        }
+        this.session = cluster.connect();
+    }
+    
+    /**
+     * Terminates session with a cluster
+     */
+    public void close()
+    {
+        this.session.close();
+    }
+}
+/*
 public class CassandraClient
 {
     private Cluster cluster;
@@ -102,3 +167,4 @@ public class CassandraClient
      }
 
 }
+*/

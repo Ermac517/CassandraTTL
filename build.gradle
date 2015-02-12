@@ -11,8 +11,8 @@ targetCompatibility = '1.8'
 version = '1.0'
 jar {
     manifest {
-        attributes 'Main-Class': 'com.github.ermac517.cassandra.CassandraClient'
-        attributes 'Implementation-Title': 'Cassanra Client', 'Implementation-Version': version
+        attributes 'Main-Class': 'com.github.ermac517.cassandra.tt.CassandraTTL'
+        attributes 'Implementation-Title': 'Cassanra TTL', 'Implementation-Version': version
     }
 }
 
